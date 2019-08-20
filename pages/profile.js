@@ -1,5 +1,5 @@
 import React, { Component, useRef } from 'react';
-import { Header, Icon, Loader, Divider, Dimmer, Message, Segment, Button, Grid } from 'semantic-ui-react';
+import { Header, Icon, Loader, Divider, Dimmer, Message, Segment, Button, Grid, Rating } from 'semantic-ui-react';
 import Layout from '../components/Layout';
 import web3 from '../ethereum/web3';
 import factory from '../ethereum/factory';
@@ -14,7 +14,11 @@ class ProfileShow extends Component {
         loader: this.props.loader,
         address: null,
         isUser: this.props.isUser,
-        token: 10
+        token: 10,
+        numOfQues: 0,
+        rateOfQues: 0,
+        numOfAns: 0,
+        rateOfAns: 0
     };
 
     async componentDidMount() {
@@ -26,11 +30,15 @@ class ProfileShow extends Component {
             } else {
                 const profileAddress = await factory.methods.getProfile(accounts[0]).call();
                 var profile = Profile(profileAddress);
-                var token = await profile.methods.getToken().call();    
+                var token = await profile.methods.getToken().call(); 
+                var numOfQues = await profile.methods.getNumOfQues().call();
+                var rateOfQues = await profile.methods.getavgQuesRate().call();
+                var numOfAns = await profile.methods.getNumOfAns().call();   
+                var rateOfAns = await profile.methods.getavgAnsRate().call();
                 var loader = false;
                 var isUser = true;
 
-                this.setState({ address: accounts[0], loader , isUser, token });
+                this.setState({ address: accounts[0], loader , isUser, token, numOfQues, numOfAns, rateOfQues, rateOfAns });
             }
         }
     }
@@ -57,10 +65,29 @@ class ProfileShow extends Component {
                     <Header.Subheader>
                         <div style={{overflow: 'hidden', textOverflow: 'ellipsis'}}>{this.state.address}</div>
                     </Header.Subheader>
-                    <span>Number of Tokens: {this.state.token/1}</span>
+                    <p>Number of Tokens: {this.state.token/1}</p>
                 </Header>
+                <Segment size='big'>
+                    <Grid columns={2} relaxed='very'>
+                        <Grid.Column textAlign='center'>
+                            <p>Number of Questions: {this.state.numOfQues/1}</p>
+                            Rating: 
+                            <Rating icon='star' size='large' 
+                                            rating={this.state.rateOfQues/1}
+                                            maxRating={5} disabled />
+                        </Grid.Column>
+                        <Grid.Column textAlign='center'>
+                            <p>Number of Answers: {this.state.numOfAns/1}</p>
+                            
+                            Rating: 
+                            <Rating icon='star' size='large' 
+                                            rating={this.state.rateOfAns/1}
+                                            maxRating={5} disabled />
+                        </Grid.Column>
+                    </Grid>
+                    <Divider vertical></Divider>
+                </Segment>
 
-                <Divider hidden/>
             </React.Fragment>
         );
     }
