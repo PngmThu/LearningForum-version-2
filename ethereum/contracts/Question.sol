@@ -19,6 +19,7 @@ contract QuestionFactory {
         Question question = Question(newQuestion);
         question.transfer(msg.value);
         Profile(users[msg.sender]).updateToken(0, deposit);
+        Profile(users[msg.sender]).increaseNumOfQues();
         question.postQuestion();  //Save posted time here
         
     }
@@ -30,6 +31,7 @@ contract QuestionFactory {
         }   
         Question question = Question(_question);
         question.answer(_reply, _fileHashes, _fileNames, msg.sender, users[msg.sender], _parent);
+        Profile(users[msg.sender]).increaseNumOfAns();
     }
 
     function ratingQuestionAt(address _question, uint _ratingQuestion) public payable{
@@ -43,6 +45,7 @@ contract QuestionFactory {
         question.ratingQuestion(_ratingQuestion); 
         question.updateDeposite(1);
         Profile(users[msg.sender]).updateToken(0, 1);
+        Profile(question.getOwnerP()).increaseSumOfQuesRate(_ratingQuestion);
     }
 
     function ratingAnswerAt(address _question, uint _ratingAnswer, uint _index) public payable {
@@ -54,6 +57,7 @@ contract QuestionFactory {
         Question question = Question(_question);
         question.transfer(msg.value);
         question.updateAnswerRate(_ratingAnswer, _index);
+        Profile(question.getAnswererP(_index)).increaseSumOfAnsRate(_ratingAnswer);
     }
 
 
@@ -110,7 +114,7 @@ contract Question {
     uint public deposit;
     uint public maxDuration;
     address public owner;
-    Profile private ownerP;
+    Profile public ownerP;
     uint public start;
     uint public questionRate;
     uint public numRate;
@@ -156,6 +160,14 @@ contract Question {
 
     function getOwner() public view returns (address){
         return owner;
+    }
+
+    function getOwnerP() public view returns (Profile){
+        return ownerP;
+    }
+    
+    function getAnswererP(uint _index) public view returns (Profile){
+        return answerList[_index].answererP;
     }
 
     function getTime() public view returns (uint, uint, uint) {
@@ -269,10 +281,48 @@ contract Question {
 contract Profile {
 
     uint public token = 10;
+    uint public numOfQues;
+    uint public sumOfQuesRate;
+    uint public numOfAns;
+    uint public sumOfAnsRate;
     address public user;
 
     function Profile (address _user) public {
         user = _user;
+    }
+
+    function increaseNumOfQues() public {
+        numOfQues++;
+    }
+
+    function increaseNumOfAns() public {
+        numOfAns++;
+    }
+
+    function increaseSumOfQuesRate(uint _rate) public {
+        sumOfQuesRate += _rate;
+    }
+
+    function increaseSumOfAnsRate(uint _rate) public {
+        sumOfAnsRate += _rate;
+    }
+
+    function getavgQuesRate() public returns (uint){
+        uint avgQuesRate = sumOfQuesRate/numOfQues;
+        return avgQuesRate;
+    }
+
+    function getavgAnsRate() public returns (uint){
+        uint avgAnsRate = sumOfAnsRate/numOfAns;
+        return avgAnsRate;
+    }
+
+    function getNumOfQues() public returns (uint){
+        return numOfQues;
+    }
+
+    function getNumOfAns() public returns (uint){
+        return numOfAns;
     }
 
     function updateToken(uint addOrSub, uint _token) public {
