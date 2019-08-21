@@ -61,7 +61,7 @@ class HeaderDesktop extends Component {
                                 <Grid inverted style={{padding: '0em 1em'}} relaxed verticalAlign='bottom'>
                                     <Grid.Column width={4}>
                                         <Header as='h3' inverted>
-                                            <Icon name='ethereum' style={{float: 'left'}}/>Ethereum Forum
+                                            <Icon name='ethereum' style={{float: 'left'}}/>EtherLearn
                                         </Header>
                                     </Grid.Column >
                                     <Grid.Column width={7} textAlign='center'>
@@ -70,12 +70,11 @@ class HeaderDesktop extends Component {
                                          //console.log('value ',this.state.value);
                                          if (this.state.value!='') Router.pushRoute(`/${'search+'+encodeURIComponent(this.state.value)}`);
                                         }}/>}
-                                        placeholder='Search topics...'
                                         size='small'
                                         onKeyDown={this.keyPress} 
                                         onChange={this.handleChange}
                                         value ={this.state.value}  
-                                        placeholder='Search Items...' size='small' fluid/>
+                                        placeholder='Search topics...' size='small' fluid/>
                                     </Grid.Column>
                                 </Grid>
                             </Container>
